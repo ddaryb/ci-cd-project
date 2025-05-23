@@ -3,8 +3,8 @@ name: CI/CD Pipeline
 on:
   push:
     branches:
-      - main  # Сборка запускается при пуше в main
-  workflow_dispatch:  # Позволяет запускать вручную через GitHub Actions
+      - main
+  workflow_dispatch:
 
 jobs:
   build-and-push:
@@ -26,3 +26,11 @@ jobs:
           context: .
           push: true
           tags: ddary/ci-cd-project:latest
+
+      - name: Scan Docker image for vulnerabilities
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ddary/ci-cd-project:latest
+          format: 'table'
+          exit-code: '1'  # Завершить с ошибкой при критических уязвимостях
+          severity: 'CRITICAL,HIGH'  # Проверять только критические и высокие риски
